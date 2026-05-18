@@ -83,6 +83,7 @@ public class MoxoService {
         JsonNode json = mapper.readTree(resp.body());
 
         // Try common binder ID paths in the response
+
         for (String path : new String[]{"data.board.id", "data.workspace_id", "data.binder_id"}) {
             String[] parts = path.split("\\.");
             JsonNode node = json;
@@ -90,5 +91,22 @@ public class MoxoService {
             if (!node.isMissingNode() && !node.asText().isBlank()) return node.asText();
         }
         return null;
+    }
+
+    public void updateVideoStatus(String binderId, String status) throws Exception {
+        String adminToken = getToken(adminEmail);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("workspace_variable.video_status", status);
+
+        HttpRequest req = HttpRequest.newBuilder()
+            .uri(URI.create(apiBase + "/v1/" + orgId + "/binders/" + binderId))
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + adminToken)
+            .method("PATCH", HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+            .build();
+
+        HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+        System.out.println("[Moxo] updateVideoStatus response: " + resp.body());
     }
 }

@@ -2,6 +2,7 @@ package com.kotak.onboarding.controller;
 
 import com.kotak.onboarding.model.OnboardingRequest;
 import com.kotak.onboarding.model.TokenRequest;
+import com.kotak.onboarding.model.VideoStatusRequest;
 import com.kotak.onboarding.service.MoxoService;
 import com.kotak.onboarding.service.RmRoundRobinService;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,21 @@ public class OnboardingController {
             result.put("success", true);
             result.put("binderId", binderId);
             result.put("assignedRm", rm.email());
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("error", e.getMessage());
+        }
+        return ResponseEntity.ok(result);
+    }
+
+    // POST /api/onboarding/video-status
+    // Updates workspace_variable.video_status — "yes" when RM joins, "no" on double timeout
+    @PostMapping("/video-status")
+    public ResponseEntity<Map<String, Object>> videoStatus(@RequestBody VideoStatusRequest req) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            moxoService.updateVideoStatus(req.getBinderId(), req.getStatus());
+            result.put("success", true);
         } catch (Exception e) {
             result.put("success", false);
             result.put("error", e.getMessage());
