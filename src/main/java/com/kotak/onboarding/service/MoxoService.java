@@ -96,8 +96,12 @@ public class MoxoService {
     public void updateVideoStatus(String binderId, String status) throws Exception {
         String adminToken = getToken(adminEmail);
 
-        Map<String, String> body = new HashMap<>();
-        body.put("workspace_variable.video_status", status);
+        // Build: { "workspace_variables": [{ "name": "video_status", "value": "yes" }] }
+        Map<String, Object> variable = new HashMap<>();
+        variable.put("name", "video_status");
+        variable.put("value", status);
+        Map<String, Object> body = new HashMap<>();
+        body.put("workspace_variables", List.of(variable));
 
         HttpRequest req = HttpRequest.newBuilder()
             .uri(URI.create(apiBase + "/v1/" + orgId + "/binders/" + binderId))
