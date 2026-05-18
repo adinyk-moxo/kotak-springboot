@@ -71,7 +71,7 @@ public class MoxoService {
         body.put("role.Client.phone_number", "+91" + phone);
         body.put("role.NRM.email", rmEmail);
         body.put("role.NRM.user_name", rmName);
-        body.put("workspace_variable.location", state);
+        body.put("workspace_variable.state", state);
 
         HttpRequest req = HttpRequest.newBuilder()
             .uri(URI.create(webhookUrl))
