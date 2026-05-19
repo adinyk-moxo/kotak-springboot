@@ -111,6 +111,6 @@ public class MoxoService {
             .build();
 
         HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[Moxo] updateVideoStatus response: " + resp.body());
+        System.out.println("[Moxo] updateVideoStatus status=" + resp.statusCode() + " body=" + resp.body());
     }
 }
