@@ -98,9 +98,10 @@ public class MoxoService {
         System.out.println("[Moxo] updateVideoStatus called with binderId=" + binderId + " status=" + status);
         String adminToken = getToken(adminEmail);
 
-        // Step 1: GET flow binder to retrieve flow_id
+        // Step 1: GET flow binder to retrieve flow_id (no /v1/ prefix for flow API)
+        String flowBase = apiBase + "/flow/binders/" + binderId;
         HttpRequest getReq = HttpRequest.newBuilder()
-            .uri(URI.create(apiBase + "/v1/flow/binders/" + binderId))
+            .uri(URI.create(flowBase))
             .header("Content-Type", "application/json")
             .header("Authorization", "Bearer " + adminToken)
             .GET()
@@ -124,7 +125,7 @@ public class MoxoService {
         body.put("workspace_variables", List.of(varEntry));
 
         HttpRequest postReq = HttpRequest.newBuilder()
-            .uri(URI.create(apiBase + "/v1/flow/binders/" + binderId + "/flows/" + flowId))
+            .uri(URI.create(flowBase + "/flows/" + flowId))
             .header("Content-Type", "application/json")
             .header("Authorization", "Bearer " + adminToken)
             .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
