@@ -100,8 +100,8 @@ public class MoxoService {
         System.out.println("[Moxo] updateVideoStatus called with binderId=" + binderId + " status=" + status);
         String adminToken = getToken(adminEmail);
 
-        // Step 1: GET flow binder to retrieve flow_id (no /v1/ prefix for flow API)
-        String flowBase = apiBase + "/flow/binders/" + binderId;
+        // Step 1: GET flow binder to retrieve flow_id
+        String flowBase = apiBase + "/v1/flow/binders/" + binderId;
         HttpRequest getReq = HttpRequest.newBuilder()
             .uri(URI.create(flowBase))
             .header("Content-Type", "application/json")
