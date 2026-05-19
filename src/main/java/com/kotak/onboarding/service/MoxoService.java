@@ -96,17 +96,39 @@ public class MoxoService {
     public void updateVideoStatus(String binderId, String status) throws Exception {
         String adminToken = getToken(adminEmail);
 
-        Map<String, String> body = new HashMap<>();
-        body.put("workspace_variable.video_status", status);
+        // Step 1: GET flow binder to retrieve flow_id
+        HttpRequest getReq = HttpRequest.newBuilder()
+            .uri(URI.create(apiBase + "/v1/flow/binders/" + binderId))
+            .header("Content-Type", "application/json")
+            .header("Authorization", "Bearer " + adminToken)
+            .GET()
+            .build();
 
-        HttpRequest req = HttpRequest.newBuilder()
-            .uri(URI.create(apiBase + "/v1/" + orgId + "/binders/" + binderId + "/variables"))
+        HttpResponse<String> getResp = http.send(getReq, HttpResponse.BodyHandlers.ofString());
+        System.out.println("[Moxo] getFlowBinder status=" + getResp.statusCode() + " body=" + getResp.body());
+
+        JsonNode getJson = mapper.readTree(getResp.body());
+        String flowId = getJson.path("data").path("flows").path(0).path("flow_id").asText();
+        if (flowId == null || flowId.isBlank()) {
+            throw new RuntimeException("Could not retrieve flow_id for binder: " + binderId);
+        }
+
+        // Step 2: POST to update workspace variable
+        Map<String, Object> varEntry = new HashMap<>();
+        varEntry.put("key", "video_status");
+        varEntry.put("value", status);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("workspace_variables", List.of(varEntry));
+
+        HttpRequest postReq = HttpRequest.newBuilder()
+            .uri(URI.create(apiBase + "/v1/flow/binders/" + binderId + "/flows/" + flowId))
             .header("Content-Type", "application/json")
             .header("Authorization", "Bearer " + adminToken)
             .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
             .build();
 
-        HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[Moxo] updateVideoStatus status=" + resp.statusCode() + " body=" + resp.body());
+        HttpResponse<String> postResp = http.send(postReq, HttpResponse.BodyHandlers.ofString());
+        System.out.println("[Moxo] updateVideoStatus status=" + postResp.statusCode() + " body=" + postResp.body());
     }
 }
