@@ -80,11 +80,12 @@ public class MoxoService {
             .build();
 
         HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+        System.out.println("[Moxo] webhookResponse status=" + resp.statusCode() + " body=" + resp.body());
         JsonNode json = mapper.readTree(resp.body());
 
         // Try common binder ID paths in the response
 
-        for (String path : new String[]{"data.board.id", "data.workspace_id", "data.binder_id"}) {
+        for (String path : new String[]{"data.board.id", "data.workspace_id", "data.binder_id", "data.id", "board_id", "binder_id", "workspace_id"}) {
             String[] parts = path.split("\\.");
             JsonNode node = json;
             for (String p : parts) node = node.path(p);
@@ -94,6 +95,7 @@ public class MoxoService {
     }
 
     public void updateVideoStatus(String binderId, String status) throws Exception {
+        System.out.println("[Moxo] updateVideoStatus called with binderId=" + binderId + " status=" + status);
         String adminToken = getToken(adminEmail);
 
         // Step 1: GET flow binder to retrieve flow_id
