@@ -25,7 +25,9 @@ public class MoxoService {
     @Value("${moxo.admin.email}") private String adminEmail;
     @Value("${moxo.webhook.url}") private String webhookUrl;
 
-    private final HttpClient http = HttpClient.newHttpClient();
+    private final HttpClient http = HttpClient.newBuilder()
+        .followRedirects(HttpClient.Redirect.NORMAL)
+        .build();
     private final ObjectMapper mapper = new ObjectMapper();
 
     public String getToken(String email) throws Exception {
