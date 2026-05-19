@@ -107,7 +107,7 @@ public class MoxoService {
             .uri(URI.create(apiBase + "/v1/" + orgId + "/binders/" + binderId))
             .header("Content-Type", "application/json")
             .header("Authorization", "Bearer " + adminToken)
-            .method("PATCH", HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
+            .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(body)))
             .build();
 
         HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
